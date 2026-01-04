@@ -1,0 +1,25 @@
+name: Deploy to EKS
+
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::322868704068:role/OIDC-GitHubOIDCRole-spUUxT4tVmBb
+          aws-region: ap-south-1
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name my-eks
+
+      - name: Apply manifests
+        run: kubectl apply -f k8s/
